@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>競走馬・オリウマ プロフィールメーカー v0.01.02</title>
+    <style>
+        /* --- 基本スタイル --- */
+        :root {
+            --color-father: #004098;
+            --color-mother: #e60012;
+            --color-text: #333;
+            --color-bg-light: #f7f7f7;
+            --color-border: #ddd;
+            --color-header-bg: #f0f0f0;
+            --color-gi: #004098;
+            --color-gii: #e60012;
+            --color-giii: #009944;
+            --color-listed: #660099;
+        }
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f2f5;
+            color: var(--color-text);
+            font-size: 14px;
+        }
+        /* --- レイアウト --- */
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+            flex-wrap: wrap; /* 縦積み対応のため */
+        }
+        .input-area {
+            flex: 1;
+            min-width: 320px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .preview-area {
+            flex: 2;
+            min-width: 320px; /* プレビューエリアも最小幅を確保 */
+        }
+        
+        /* --- 入力エリアのスタイル --- */
+        .input-area h2 {
+            margin-top: 0;
+            border-bottom: 2px solid var(--color-father);
+            padding-bottom: 5px;
+        }
+        .form-section {
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: bold;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="date"],
+        .form-group input[type="number"],
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        #add-race-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--color-father);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        #add-race-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* --- プレビューエリアのスタイル --- */
+        .preview-box {
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        #responsive-message {
+            display: none; /* デフォルトは非表示 */
+            width: 100%; /* コンテナ幅いっぱいに広げる */
+            text-align: center;
+            padding: 10px;
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+        /* 基本情報プレビュー */
+        .profile-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .profile-table th, .profile-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--color-border);
+        }
+        .profile-table th {
+            width: 120px;
+            background-color: var(--color-bg-light);
+            font-weight: normal;
+        }
+        .pedigree-box { display: flex; }
+        .pedigree-label { padding: 4px 8px; color: white; border-radius: 4px; margin-right: 8px; font-size: 12px; }
+        .father-label { background-color: var(--color-father); }
+        .mother-label { background-color: var(--color-mother); }
+        .pedigree-name { font-weight: bold; font-size: 16px; }
+        .pedigree-sire { font-size: 12px; color: #666; }
+
+        /* 成績表プレビュー */
+        .results-header {
+            padding: 12px;
+            background-color: var(--color-header-bg);
+            border-bottom: 1px solid var(--color-border);
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        .results-table th {
+            padding: 10px 5px;
+            background-color: var(--color-header-bg);
+            font-weight: normal;
+        }
+        .results-table td {
+            padding: 10px 5px;
+            border-top: 1px solid var(--color-border);
+        }
+        .race-name { text-align: left; padding-left: 10px; }
+        .race-grade { display: inline-block; padding: 2px 6px; color: white; border-radius: 4px; font-size: 10px; margin-left: 5px; }
+        .grade-g1 { background-color: var(--color-gi); }
+        .grade-g2 { background-color: var(--color-gii); }
+        .grade-g3 { background-color: var(--color-giii); }
+        .grade-l { background-color: var(--color-listed); }
+        .grade-op, .grade-other { background-color: #6c757d; }
+        
+        /* レスポンシブ対応 */
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+            }
+            .preview-area {
+                margin-top: 0; /* メッセージが間に入るのでマージン不要に */
+            }
+            #responsive-message { 
+                display: block; /* 画面幅が狭い時だけ表示 */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- ▼▼▼▼▼ 変更点 ▼▼▼▼▼ -->
+        <div id="responsive-message">プレビューエリアが入力エリアの下に表示されています。画面幅を広げると見やすくなります。</div>
+        <!-- ▲▲▲▲▲ 変更点 ▲▲▲▲▲ -->
+
+        <!-- ==================== 入力エリア ==================== -->
+        <div class="input-area">
+            <h2>入力フォーム</h2>
+
+            <div class="form-section">
+                <h3>モード選択</h3>
+                <div class="form-group">
+                    <input type="radio" id="mode-fictional" name="mode" value="fictional" checked>
+                    <label for="mode-fictional">架空馬</label>
+                    <input type="radio" id="mode-original" name="mode" value="original">
+                    <label for="mode-original">オリウマ</label>
+                </div>
+            </div>
+
+            <!-- 基本情報フォーム -->
+            <div id="basic-info-forms">
+                <!-- 架空馬フォーム -->
+                <div id="form-fictional" class="form-section">
+                    <h3>基本情報 (架空馬)</h3>
+                    <div class="form-group"><label for="f-horseName">馬名</label><input type="text" id="f-horseName"></div>
+                    <div class="form-group"><label for="f-horseNameEn">欧字馬名</label><input type="text" id="f-horseNameEn"></div>
+                    <div class="form-group"><label for="f-sexAge">性齢</label><input type="text" id="f-sexAge"></div>
+                    <div class="form-group"><label for="f-father">父名</label><input type="text" id="f-father"></div>
+                    <div class="form-group"><label for="f-mother">母名</label><input type="text" id="f-mother"></div>
+                    <div class="form-group"><label for="f-bms">母父名</label><input type="text" id="f-bms"></div>
+                    <div class="form-group"><label for="f-totalResults">通算成績 (手入力)</label><input type="text" id="f-totalResults"></div>
+                    <div class="form-group"><label for="f-stable">所属厩舎</label><input type="text" id="f-stable"></div>
+                    <div class="form-group"><label for="f-breeder">生産者</label><input type="text" id="f-breeder"></div>
+                    <div class="form-group"><label for="f-owner">馬主</label><input type="text" id="f-owner"></div>
+                    <div class="form-group"><label for="f-mainWin">主な勝ち鞍</label><input type="text" id="f-mainWin"></div>
+                    <div class="form-group"><label for="f-birthday">生年月日</label><input type="date" id="f-birthday"></div>
+                    <div class="form-group"><label for="f-meaning">馬名の意味</label><input type="text" id="f-meaning"></div>
+                    <div class="form-group"><label for="f-nextRace">次走予定</label><input type="text" id="f-nextRace"></div>
+                </div>
+
+                <!-- オリウマフォーム -->
+                <div id="form-original" class="form-section" style="display:none;">
+                    <h3>基本情報 (オリウマ)</h3>
+                    <div class="form-group"><label for="o-name">名前</label><input type="text" id="o-name"></div>
+                    <div class="form-group"><label for="o-nameEn">欧字名</label><input type="text" id="o-nameEn"></div>
+                    <div class="form-group"><label for="o-ear">耳飾り</label>
+                        <select id="o-ear">
+                            <option value="右">右</option> <option value="左">左</option> <option value="両">両</option> <option value="なし">なし</option>
+                        </select>
+                    </div>
+                     <div class="form-group"><label for="o-grade">学年</label>
+                        <select id="o-grade">
+                            <option value="中等部">中等部</option><option value="中等部1年">中等部1年</option><option value="中等部2年">中等部2年</option><option value="中等部3年">中等部3年</option>
+                            <option value="高等部">高等部</option><option value="高等部1年">高等部1年</option><option value="高等部2年">高等部2年</option><option value="高等部3年">高等部3年</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label for="o-dorm">所属寮</label>
+                        <select id="o-dorm">
+                            <option value="美浦">美浦</option><option value="栗東">栗東</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label for="o-totalResults">通算成績 (手入力)</label><input type="text" id="o-totalResults"></div>
+                    <div class="form-group"><label for="o-mainWin">主な勝ち鞍</label><input type="text" id="o-mainWin"></div>
+                    <div class="form-group"><label for="o-birthday">生年月日</label><input type="date" id="o-birthday"></div>
+                    <div class="form-group"><label for="o-meaning">名前の意味</label><input type="text" id="o-meaning"></div>
+                    <div class="form-group"><label for="o-nextRace">次走予定</label><input type="text" id="o-nextRace"></div>
+                </div>
+            </div>
+
+            <!-- 成績追加フォーム -->
+            <div class="form-section">
+                <h3>レース成績の追加</h3>
+                <div class="form-group"><label for="race-date">開催日</label><input type="text" id="race-date" placeholder="22/06/05"></div>
+                <div class="form-group"><label for="race-course">開催地</label><input type="text" id="race-course" placeholder="東京11R"></div>
+                <div class="form-group"><label for="race-name">レース名</label><input type="text" id="race-name"></div>
+                <div class="form-group"><label for="race-grade">格付け</label>
+                    <select id="race-grade">
+                        <option value="GⅠ">GⅠ</option><option value="GⅡ">GⅡ</option><option value="GⅢ">GⅢ</option><option value="L">L</option><option value="OP">OP</option>
+                        <option value="3勝">3勝</option><option value="2勝">2勝</option><option value="1勝">1勝</option><option value="未勝利">未勝利</option><option value="新馬">新馬</option>
+                        <option value="その他">その他</option>
+                    </select>
+                </div>
+                <div class="form-group"><label for="race-pop">人気</label><input type="number" id="race-pop"></div>
+                <div class="form-group"><label for="race-rank">着順</label><input type="number" id="race-rank"></div>
+                <div class="form-group"><label for="race-jockey">騎手/担当</label><input type="text" id="race-jockey"></div>
+                <div class="form-group"><label for="race-weight">斤量/バ場</label><input type="text" id="race-weight" placeholder="56"></div>
+                <div class="form-group"><label for="race-odds">オッズ/距離</label><input type="text" id="race-odds" placeholder="7.8"></div>
+                <button id="add-race-btn">成績を追加</button>
+            </div>
+        </div>
+
+        <!-- ==================== プレビューエリア ==================== -->
+        <div class="preview-area">
+            
+            <!-- 基本情報プレビュー -->
+            <div class="preview-box">
+                <table class="profile-table">
+                    <tbody id="preview-basic-info">
+                        <!-- ここにJSで内容を生成 -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 成績表プレビュー -->
+            <div class="preview-box">
+                <div class="results-header">競走成績</div>
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>開催</th>
+                            <th>レース名</th>
+                            <th>人気</th>
+                            <th>着順</th>
+                            <th>騎手</th>
+                            <th>斤量</th>
+                            <th>オッズ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="preview-results-table">
+                        <!-- ここにJSで成績を追加 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- 要素の取得 ---
+        const modeRadios = document.querySelectorAll('input[name="mode"]');
+        const formFictional = document.getElementById('form-fictional');
+        const formOriginal = document.getElementById('form-original');
+        const addRaceBtn = document.getElementById('add-race-btn');
+        const previewBasicInfo = document.getElementById('preview-basic-info');
+        const previewResultsTable = document.getElementById('preview-results-table');
+        
+        // --- データ管理オブジェクト ---
+        let appData = {
+            mode: 'fictional',
+            fictional: { horseName: '', horseNameEn: '', sexAge: '', father: '', mother: '', bms: '', totalResults: '', stable: '', breeder: '', owner: '', mainWin: '', birthday: '', meaning: '', nextRace: '' },
+            original: { name: '', nameEn: '', ear: '右', grade: '中等部', dorm: '美浦', totalResults: '', mainWin: '', birthday: '', meaning: '', nextRace: '' },
+            races: []
+        };
+        
+        // --- イベントリスナー ---
+        
+        // モード切替
+        modeRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                appData.mode = e.target.value;
+                updateFormVisibility();
+                updateBasicInfoPreview();
+            });
+        });
+        
+        // 基本情報フォームの入力
+        document.getElementById('basic-info-forms').addEventListener('input', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') {
+                const mode = appData.mode;
+                const key = e.target.id.substring(2); // 'f-horseName' -> 'horseName'
+                const formattedKey = key.charAt(0).toLowerCase() + key.slice(1);
+                appData[mode][formattedKey] = e.target.value;
+                updateBasicInfoPreview();
+            }
+        });
+
+        // 成績追加ボタン
+        addRaceBtn.addEventListener('click', () => {
+            const newRace = {
+                date: document.getElementById('race-date').value,
+                course: document.getElementById('race-course').value,
+                name: document.getElementById('race-name').value,
+                grade: document.getElementById('race-grade').value,
+                pop: document.getElementById('race-pop').value,
+                rank: document.getElementById('race-rank').value,
+                jockey: document.getElementById('race-jockey').value,
+                weight: document.getElementById('race-weight').value,
+                odds: document.getElementById('race-odds').value,
+            };
+            appData.races.unshift(newRace); // 配列の先頭に追加
+            updateResultsPreview();
+            // フォームをクリア
+            document.getElementById('race-date').value = '';
+            document.getElementById('race-course').value = '';
+            document.getElementById('race-name').value = '';
+            document.getElementById('race-pop').value = '';
+            document.getElementById('race-rank').value = '';
+            document.getElementById('race-jockey').value = '';
+            document.getElementById('race-weight').value = '';
+            document.getElementById('race-odds').value = '';
+        });
+
+        // --- 表示更新関数 ---
+        
+        function updateFormVisibility() {
+            if (appData.mode === 'fictional') {
+                formFictional.style.display = 'block';
+                formOriginal.style.display = 'none';
+            } else {
+                formFictional.style.display = 'none';
+                formOriginal.style.display = 'block';
+            }
+        }
+        
+        function updateBasicInfoPreview() {
+            previewBasicInfo.innerHTML = ''; // プレビューをクリア
+            const data = appData[appData.mode];
+            
+            let html = '';
+            if (appData.mode === 'fictional') {
+                html = `
+                    <tr><td colspan="2"><h2>${data.horseName || '馬名'} <small>${data.horseNameEn || ''}</small></h2></td></tr>
+                    <tr><td colspan="2"><div class="pedigree-box"><span class="pedigree-label father-label">父</span><div><div class="pedigree-name">${data.father || '-'}</div></div></div></td></tr>
+                    <tr><td colspan="2"><div class="pedigree-box"><span class="pedigree-label mother-label">母</span><div><div class="pedigree-name">${data.mother || '-'}</div><div class="pedigree-sire">母父: ${data.bms || '-'}</div></div></div></td></tr>
+                    <tr><th>性齢</th><td>${data.sexAge || '-'}</td></tr>
+                    <tr><th>馬主</th><td>${data.owner || '-'}</td></tr>
+                    <tr><th>所属厩舎</th><td>${data.stable || '-'}</td></tr>
+                    <tr><th>生産者</th><td>${data.breeder || '-'}</td></tr>
+                    <tr><th>通算成績</th><td>${data.totalResults || '-'}</td></tr>
+                    <tr><th>主な勝ち鞍</th><td>${data.mainWin || '-'}</td></tr>
+                    <tr><th>生年月日</th><td>${data.birthday ? new Date(data.birthday).toLocaleDateString('ja-JP') : '-'}</td></tr>
+                    <tr><th>馬名の意味</th><td>${data.meaning || '-'}</td></tr>
+                    <tr><th>次走予定</th><td>${data.nextRace || '-'}</td></tr>
+                `;
+            } else {
+                html = `
+                    <tr><td colspan="2"><h2>${data.name || '名前'} <small>${data.nameEn || ''}</small></h2></td></tr>
+                    <tr><th>耳飾り</th><td>${data.ear || '-'}</td></tr>
+                    <tr><th>学年</th><td>${data.grade || '-'}</td></tr>
+                    <tr><th>所属寮</th><td>${data.dorm || '-'}</td></tr>
+                    <tr><th>通算成績</th><td>${data.totalResults || '-'}</td></tr>
+                    <tr><th>主な勝ち鞍</th><td>${data.mainWin || '-'}</td></tr>
+                    <tr><th>生年月日</th><td>${data.birthday ? new Date(data.birthday).toLocaleDateString('ja-JP') : '-'}</td></tr>
+                    <tr><th>名前の意味</th><td>${data.meaning || '-'}</td></tr>
+                    <tr><th>次走予定</th><td>${data.nextRace || '-'}</td></tr>
+                `;
+            }
+            previewBasicInfo.innerHTML = html;
+        }
+
+        function updateResultsPreview() {
+            previewResultsTable.innerHTML = '';
+            appData.races.forEach(race => {
+                const gradeClass = getGradeClass(race.grade);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${race.date}<br>${race.course}</td>
+                    <td class="race-name">${race.name} <span class="race-grade ${gradeClass}">${race.grade}</span></td>
+                    <td>${race.pop || '-'}</td>
+                    <td>${race.rank || '-'}</td>
+                    <td>${race.jockey || '-'}</td>
+                    <td>${race.weight || '-'}</td>
+                    <td>${race.odds || '-'}</td>
+                `;
+                previewResultsTable.appendChild(tr);
+            });
+        }
+        
+        function getGradeClass(grade) {
+            if (grade === 'GⅠ') return 'grade-g1';
+            if (grade === 'GⅡ') return 'grade-g2';
+            if (grade === 'GⅢ') return 'grade-g3';
+            if (grade === 'L') return 'grade-l';
+            if (grade === 'OP') return 'grade-op';
+            return 'grade-other';
+        }
+
+        // --- 初期化処理 ---
+        updateFormVisibility();
+        updateBasicInfoPreview();
+    });
+    </script>
+
+</body>
+</html>
