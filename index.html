@@ -3,64 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>競走馬・オリウマ プロフィールメーカー v0.02.01</title>
+    <title>競走馬・オリウマ プロフィールメーカー v0.03.04</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        /* --- 基本スタイル --- */
-        :root {
-            --color-father: #004098;
-            --color-mother: #e60012;
-            --color-text: #333;
-            --color-bg-light: #f7f7f7;
-            --color-border: #ddd;
-            --color-header-bg: #f0f0f0;
-            --color-gi: #004098;
-            --color-gii: #e60012;
-            --color-giii: #009944;
-            --color-listed: #660099;
-            --color-edit: #007bff;
-            --color-delete: #dc3545;
-            --color-success: #28a745;
-        }
-        html { scroll-behavior: smooth; } /* スムーズスクロールを有効化 */
-        body {
-            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f0f2f5;
-            color: var(--color-text);
-            font-size: 14px;
-        }
-        /* --- レイアウト --- */
+        :root { --color-father: #004098; --color-mother: #e60012; --color-text: #333; --color-bg-light: #f7f7f7; --color-border: #ddd; --color-header-bg: #f0f0f0; --color-gi: #004098; --color-gii: #e60012; --color-giii: #009944; --color-listed: #660099; --color-edit: #007bff; --color-delete: #dc3545; --color-success: #28a745; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif; margin: 0; padding: 20px; background-color: #f0f2f5; color: var(--color-text); font-size: 14px; }
         .container { display: flex; gap: 20px; max-width: 1600px; margin: 0 auto; flex-wrap: wrap; }
         .input-area { flex: 1; min-width: 320px; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .preview-area { flex: 2; min-width: 320px; }
-        
-        /* --- ユーティリティ & コンポーネント --- */
         .btn { padding: 8px 12px; border: none; border-radius: 4px; color: white; cursor: pointer; transition: opacity 0.2s; font-size: 12px; }
         .btn:hover { opacity: 0.8; }
         .btn-primary { background-color: var(--color-father); }
         .btn-success { background-color: var(--color-success); }
         .btn-edit { background-color: var(--color-edit); }
         .btn-delete { background-color: var(--color-delete); }
-
-        .io-buttons { display: flex; gap: 10px; margin-bottom: 20px; }
-        
-        /* --- トースト通知 --- */
+        .io-buttons { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
         #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
         .toast-message { background-color: var(--color-success); color: white; padding: 15px; border-radius: 5px; margin-bottom: 10px; opacity: 0; transform: translateX(100%); transition: all 0.4s ease-in-out; }
         .toast-message.show { opacity: 1; transform: translateX(0); }
-
-        /* --- 入力エリアのスタイル --- */
-        .input-area h2 { margin-top: 0; border-bottom: 2px solid var(--color-father); padding-bottom: 5px; }
+        .input-area h2, .input-area h3 { margin-top: 0; }
+        .input-area h2 { border-bottom: 2px solid var(--color-father); padding-bottom: 5px; }
         .form-section { margin-bottom: 20px; }
         .form-group { margin-bottom: 10px; }
         .form-group label { display: block; margin-bottom: 4px; font-weight: bold; }
-        .form-group input[type="text"], .form-group input[type="date"], .form-group input[type="number"], .form-group select { width: 100%; padding: 8px; border: 1px solid var(--color-border); border-radius: 4px; box-sizing: border-box; }
+        .form-group input, .form-group select { width: 100%; padding: 8px; border: 1px solid var(--color-border); border-radius: 4px; box-sizing: border-box; }
+        .form-group input[readonly] { background-color: #e9ecef; }
         .form-row { display: flex; gap: 10px; }
         .form-row > * { flex: 1; }
         #add-race-btn { width: 100%; padding: 10px; font-size: 16px; }
-
-        /* --- プレビューエリアのスタイル --- */
+        .radio-group label { display: inline-block; font-weight: normal; margin-bottom: 0; margin-right: 15px; vertical-align: middle; }
+        .radio-group input[type="radio"] { width: auto; vertical-align: middle; margin-right: 4px; }
         .preview-box { background-color: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
         #responsive-message { display: none; width: 100%; text-align: center; padding: 10px; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 4px; margin-bottom: 15px; box-sizing: border-box; }
         .profile-table { width: 100%; border-collapse: collapse; }
@@ -79,24 +52,36 @@
         .race-grade { display: inline-block; padding: 2px 6px; color: white; border-radius: 4px; font-size: 10px; margin-left: 5px; }
         .grade-g1 { background-color: var(--color-gi); } .grade-g2 { background-color: var(--color-gii); } .grade-g3 { background-color: var(--color-giii); } .grade-l { background-color: var(--color-listed); } .grade-op, .grade-other { background-color: #6c757d; }
         .action-buttons { display: flex; gap: 5px; justify-content: center; }
-        
+        .export-clone { position: absolute; left: -9999px; top: 0; width: 1200px !important; background-color: white; z-index: -1; }
+        .export-clone .profile-table,
+        .export-clone .results-table { table-layout: fixed; width: 100%; }
         @media (max-width: 900px) { .container { flex-direction: column; } .preview-area { margin-top: 0; } #responsive-message { display: block; } }
     </style>
 </head>
 <body>
-
     <div class="container">
         <div id="responsive-message">プレビューエリアが入力エリアの下に表示されています。画面幅を広げると見やすくなります。</div>
         <div class="input-area">
             <h2>入力フォーム</h2>
-            <div class="io-buttons">
-                <button id="save-json-btn" class="btn btn-primary">データを保存 (JSON)</button>
-                <button id="load-json-btn" class="btn btn-success">データを読み込み (JSON)</button>
-                <input type="file" id="json-file-input" accept=".json" style="display: none;">
+            <div class="form-section">
+                <h3>データ管理</h3>
+                <div class="io-buttons">
+                    <button id="save-json-btn" class="btn btn-primary">データを保存</button>
+                    <button id="load-json-btn" class="btn btn-success">データを読み込み</button>
+                    <input type="file" id="json-file-input" accept=".json" style="display: none;">
+                </div>
+            </div>
+            <div class="form-section">
+                <h3>画像として出力</h3>
+                <div class="io-buttons">
+                    <button id="export-all-btn" class="btn btn-primary">結合</button>
+                    <button id="export-profile-btn" class="btn btn-primary">基本情報のみ</button>
+                    <button id="export-results-btn" class="btn btn-primary">成績表のみ</button>
+                </div>
             </div>
             <div class="form-section">
                 <h3>モード選択</h3>
-                <div class="form-group">
+                <div class="form-group radio-group">
                     <input type="radio" id="mode-fictional" name="mode" value="fictional" checked> <label for="mode-fictional">架空馬</label>
                     <input type="radio" id="mode-original" name="mode" value="original"> <label for="mode-original">オリウマ</label>
                 </div>
@@ -110,15 +95,11 @@
                     <div class="form-group"><label for="f-mother">母名</label><input type="text" id="f-mother"></div>
                     <div class="form-group"><label for="f-bms">母父名</label><input type="text" id="f-bms"></div>
                     <div class="form-group"><label for="f-sexAge">性齢</label><input type="text" id="f-sexAge"></div>
-                    <div class="form-group"><label for="f-affiliation">所属</label>
-                        <div class="form-row">
-                            <select id="f-affiliationSelect"><option value="美浦">美浦</option><option value="栗東">栗東</option><option value="地方">地方</option><option value="海外">海外</option></select>
-                            <input type="text" id="f-affiliationText" placeholder="厩舎名など">
-                        </div>
-                    </div>
+                    <div class="form-group"><label for="f-affiliation">所属</label><div class="form-row"><select id="f-affiliationSelect"><option value="美浦">美浦</option><option value="栗東">栗東</option><option value="地方">地方</option><option value="海外">海外</option></select><input type="text" id="f-affiliationText" placeholder="厩舎名など"></div></div>
                     <div class="form-group"><label for="f-owner">馬主</label><input type="text" id="f-owner"></div>
                     <div class="form-group"><label for="f-breeder">生産者</label><input type="text" id="f-breeder"></div>
-                    <div class="form-group"><label for="f-totalResults">通算成績 (手入力)</label><input type="text" id="f-totalResults"></div>
+                    <div class="form-group"><label for="f-totalResults">通算成績 (自動計算)</label><input type="text" id="f-totalResults" readonly></div>
+                    <div class="form-group"><label for="f-totalPrize">総獲得賞金 (自動計算)</label><input type="text" id="f-totalPrize" readonly></div>
                     <div class="form-group"><label for="f-mainWin">主な勝ち鞍</label><input type="text" id="f-mainWin"></div>
                     <div class="form-group"><label for="f-birthday">生年月日</label><input type="date" id="f-birthday"></div>
                     <div class="form-group"><label for="f-meaning">馬名の意味</label><input type="text" id="f-meaning"></div>
@@ -130,13 +111,9 @@
                     <div class="form-group"><label for="o-nameEn">欧字名</label><input type="text" id="o-nameEn"></div>
                     <div class="form-group"><label for="o-ear">耳飾り</label><select id="o-ear"><option value="右">右</option><option value="左">左</option><option value="両">両</option><option value="なし">なし</option></select></div>
                     <div class="form-group"><label for="o-grade">学年</label><select id="o-grade"><option value="中等部">中等部</option><option value="中等部1年">中等部1年</option><option value="中等部2年">中等部2年</option><option value="中等部3年">中等部3年</option><option value="高等部">高等部</option><option value="高等部1年">高等部1年</option><option value="高等部2年">高等部2年</option><option value="高等部3年">高等部3年</option></select></div>
-                    <div class="form-group"><label for="o-dorm">所属寮</label>
-                        <div class="form-row">
-                            <select id="o-dormSelect"><option value="美浦">美浦</option><option value="栗東">栗東</option><option value="地方">地方</option><option value="海外">海外</option><option value="その他">その他</option><option value="">(空欄)</option></select>
-                            <input type="text" id="o-dormText" placeholder="自由記述">
-                        </div>
-                    </div>
-                    <div class="form-group"><label for="o-totalResults">通算成績 (手入力)</label><input type="text" id="o-totalResults"></div>
+                    <div class="form-group"><label for="o-dorm">所属寮</label><div class="form-row"><select id="o-dormSelect"><option value="美浦">美浦</option><option value="栗東">栗東</option><option value="地方">地方</option><option value="海外">海外</option><option value="その他">その他</option><option value="">(空欄)</option></select><input type="text" id="o-dormText" placeholder="自由記述"></div></div>
+                    <div class="form-group"><label for="o-totalResults">通算成績 (自動計算)</label><input type="text" id="o-totalResults" readonly></div>
+                    <div class="form-group"><label for="o-totalFans">累計ファン数 (自動計算)</label><input type="text" id="o-totalFans" readonly></div>
                     <div class="form-group"><label for="o-mainWin">主な勝ち鞍</label><input type="text" id="o-mainWin"></div>
                     <div class="form-group"><label for="o-birthday">生年月日</label><input type="date" id="o-birthday"></div>
                     <div class="form-group"><label for="o-meaning">名前の意味</label><input type="text" id="o-meaning"></div>
@@ -149,19 +126,21 @@
                 <div class="form-group"><label for="race-course">開催地</label><input type="text" id="race-course" placeholder="東京11R"></div>
                 <div class="form-group"><label for="race-name">レース名</label><input type="text" id="race-name"></div>
                 <div class="form-group"><label for="race-grade">格付け</label><select id="race-grade"><option value="GⅠ">GⅠ</option><option value="GⅡ">GⅡ</option><option value="GⅢ">GⅢ</option><option value="L">L</option><option value="OP">OP</option><option value="3勝">3勝</option><option value="2勝">2勝</option><option value="1勝">1勝</option><option value="未勝利">未勝利</option><option value="新馬">新馬</option><option value="その他">その他</option></select></div>
+                <div class="form-group"><label for="race-distance">距離</label><input type="text" id="race-distance" placeholder="芝2400m"></div>
                 <div class="form-row"><div class="form-group"><label for="race-pop">人気</label><input type="number" id="race-pop"></div><div class="form-group"><label for="race-rank">着順</label><input type="number" id="race-rank"></div></div>
                 <div class="form-group"><label for="race-jockey">騎手/担当</label><input type="text" id="race-jockey"></div>
                 <div class="form-row"><div class="form-group"><label for="race-weight">斤量</label><input type="text" id="race-weight" placeholder="56"></div><div class="form-group"><label for="race-odds">オッズ</label><input type="text" id="race-odds" placeholder="7.8"></div></div>
-                <div class="form-group"><label for="race-distance">距離</label><input type="text" id="race-distance" placeholder="芝2400m"></div>
+                <div class="form-group" id="race-prize-group"><label for="race-prize">獲得賞金(万円)</label><input type="number" id="race-prize" placeholder="0"></div>
+                <div class="form-group" id="race-fans-group" style="display:none;"><label for="race-fans">獲得ファン数</label><input type="number" id="race-fans" placeholder="0"></div>
                 <button id="add-race-btn" class="btn btn-primary">成績を追加</button>
             </div>
         </div>
-        <div class="preview-area">
-            <div class="preview-box"><table class="profile-table"><tbody id="preview-basic-info"></tbody></table></div>
-            <div class="preview-box">
+        <div class="preview-area" id="preview-area">
+            <div class="preview-box" id="profile-preview-box"><table class="profile-table"><tbody id="preview-basic-info"></tbody></table></div>
+            <div class="preview-box" id="results-preview-box">
                 <div class="results-header">競走成績</div>
                 <table class="results-table">
-                    <thead><tr><th>開催</th><th>レース名</th><th>人気</th><th>着順</th><th>騎手</th><th>斤量</th><th>オッズ</th><th>距離</th><th>操作</th></tr></thead>
+                    <thead><tr><th>開催</th><th>レース名</th><th>距離</th><th>人気</th><th>着順</th><th>騎手</th><th>斤量</th><th>オッズ</th><th>操作</th></tr></thead>
                     <tbody id="preview-results-table"></tbody>
                 </table>
             </div>
@@ -173,14 +152,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         let appData = createInitialData();
         let editingIndex = null;
-        function createInitialData() {
-            return {
-                mode: 'fictional',
-                fictional: { horseName: '', horseNameEn: '', father: '', mother: '', bms: '', sexAge: '', affiliationSelect: '美浦', affiliationText: '', owner: '', breeder: '', totalResults: '', mainWin: '', birthday: '', meaning: '', nextRace: '' },
-                original: { name: '', nameEn: '', ear: '右', grade: '中等部', dormSelect: '美浦', dormText: '', totalResults: '', mainWin: '', birthday: '', meaning: '', nextRace: '' },
-                races: []
-            };
-        }
+        function createInitialData() { return { mode: 'fictional', fictional: { horseName: '', horseNameEn: '', father: '', mother: '', bms: '', sexAge: '', affiliationSelect: '美浦', affiliationText: '', owner: '', breeder: '', totalResults: '', totalPrize: '', mainWin: '', birthday: '', meaning: '', nextRace: '' }, original: { name: '', nameEn: '', ear: '右', grade: '中等部', dormSelect: '美浦', dormText: '', totalResults: '', totalFans: '', mainWin: '', birthday: '', meaning: '', nextRace: '' }, races: [] }; }
         const inputArea = document.querySelector('.input-area');
         const addRaceBtn = document.getElementById('add-race-btn');
         inputArea.addEventListener('change', handleInputChange);
@@ -190,122 +162,63 @@
         document.getElementById('load-json-btn').addEventListener('click', () => document.getElementById('json-file-input').click());
         document.getElementById('json-file-input').addEventListener('change', loadFromJson);
         document.getElementById('preview-results-table').addEventListener('click', handleRaceAction);
+        document.getElementById('export-all-btn').addEventListener('click', () => exportImage(document.getElementById('preview-area'), 'all'));
+        document.getElementById('export-profile-btn').addEventListener('click', () => exportImage(document.getElementById('profile-preview-box'), 'profile'));
+        document.getElementById('export-results-btn').addEventListener('click', () => exportImage(document.getElementById('results-preview-box'), 'results'));
 
-        function handleInputChange(e) {
-            const target = e.target;
-            if (!target.id) return;
-            if (target.id.startsWith('f-') || target.id.startsWith('o-')) {
-                appData[appData.mode][target.id.substring(2)] = target.value;
-            } else if (target.name === 'mode') {
-                appData.mode = target.value;
-            }
-            updateAllViews();
-        }
-        function handleAddOrUpdateRace() {
-            const raceData = getRaceFormValues();
-            if (editingIndex !== null) { appData.races[editingIndex] = raceData; } 
-            else { appData.races.unshift(raceData); }
-            resetRaceForm();
-            updateAllViews();
-        }
-        function handleRaceAction(e) {
-            const target = e.target.closest('button');
-            if (!target) return;
-            const index = parseInt(target.dataset.index, 10);
-            if (target.classList.contains('btn-edit')) { startEditingRace(index); }
-            else if (target.classList.contains('btn-delete')) { deleteRace(index); }
-        }
-        function startEditingRace(index) {
-            editingIndex = index;
-            setRaceFormValues(appData.races[index]);
-            addRaceBtn.textContent = '成績を更新';
-            addRaceBtn.classList.replace('btn-primary', 'btn-success');
-            document.getElementById('race-form-header').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-        function deleteRace(index) {
-            if (confirm('このレース成績を削除しますか？')) {
-                appData.races.splice(index, 1);
-                resetRaceForm();
-                updateAllViews();
-            }
-        }
-        function saveToJson() {
-            const dataStr = JSON.stringify(appData, null, 2);
-            const blob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
+        function handleInputChange(e) { const target = e.target; if (!target.id) return; if (target.id.startsWith('f-') || target.id.startsWith('o-')) { appData[appData.mode][target.id.substring(2)] = target.value; } else if (target.name === 'mode') { appData.mode = target.value; } updateAllViews(); }
+        function handleAddOrUpdateRace() { const raceData = getRaceFormValues(); if (editingIndex !== null) { appData.races[editingIndex] = raceData; } else { appData.races.unshift(raceData); } resetRaceForm(); updateAllViews(); }
+        function handleRaceAction(e) { const target = e.target.closest('button'); if (!target) return; const index = parseInt(target.dataset.index, 10); if (target.classList.contains('btn-edit')) { startEditingRace(index); } else if (target.classList.contains('btn-delete')) { deleteRace(index); } }
+        function startEditingRace(index) { editingIndex = index; setRaceFormValues(appData.races[index]); addRaceBtn.textContent = '成績を更新'; addRaceBtn.classList.replace('btn-primary', 'btn-success'); document.getElementById('race-form-header').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        function deleteRace(index) { if (confirm('このレース成績を削除しますか？')) { appData.races.splice(index, 1); resetRaceForm(); updateAllViews(); } }
+        function saveToJson() { const dataStr = JSON.stringify(appData, null, 2); const blob = new Blob([dataStr], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); const fileNameBase = appData.mode === 'fictional' ? appData.fictional.horseName : appData.original.name; a.download = `${fileNameBase || 'profile'}.json`; a.href = url; a.click(); URL.revokeObjectURL(url); }
+        function loadFromJson(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (event) => { try { const loadedData = JSON.parse(event.target.result); appData = { ...createInitialData(), ...loadedData }; appData.races = appData.races.map(r => ({ ...{ prize: 0, fans: 0 }, ...r })); resetRaceForm(); loadDataIntoForms(); updateAllViews(); showToast('データの読み込みが完了しました。'); } catch (err) { alert('ファイルの読み込みに失敗しました。'); console.error(err); } }; reader.readAsText(file); e.target.value = ''; }
+        
+        // ▼▼▼▼▼ 修正点 ▼▼▼▼▼
+        function nextFrame() { return new Promise(resolve => { requestAnimationFrame(resolve); }); }
+        async function exportImage(targetElement, suffix) {
             const fileNameBase = appData.mode === 'fictional' ? appData.fictional.horseName : appData.original.name;
-            a.download = `${fileNameBase || 'profile'}.json`; a.href = url; a.click(); URL.revokeObjectURL(url);
-        }
-        function loadFromJson(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                try {
-                    appData = { ...createInitialData(), ...JSON.parse(event.target.result) };
-                    resetRaceForm();
-                    loadDataIntoForms();
-                    updateAllViews();
-                    showToast('データの読み込みが完了しました。');
-                } catch (err) { alert('ファイルの読み込みに失敗しました。'); }
-            };
-            reader.readAsText(file);
-            e.target.value = '';
-        }
-        function showToast(message) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'toast-message';
-            toast.textContent = message;
-            container.appendChild(toast);
-            setTimeout(() => toast.classList.add('show'), 100);
-            setTimeout(() => {
-                toast.classList.remove('show');
-                toast.addEventListener('transitionend', () => toast.remove());
-            }, 3000);
-        }
-        function updateAllViews() {
-            updateFormVisibility();
-            updateBasicInfoPreview();
-            updateResultsPreview();
-        }
-        function updateFormVisibility() {
-            document.getElementById('form-fictional').style.display = appData.mode === 'fictional' ? 'block' : 'none';
-            document.getElementById('form-original').style.display = appData.mode === 'original' ? 'block' : 'none';
-        }
-        function updateBasicInfoPreview() {
-            const container = document.getElementById('preview-basic-info');
-            const data = appData[appData.mode];
-            let html = '';
-            if (appData.mode === 'fictional') {
-                const affiliation = [data.affiliationSelect, data.affiliationText].filter(Boolean).join(' ');
-                html = `<tr><td colspan="2"><h2>${data.horseName || '馬名'} <small>${data.horseNameEn || ''}</small></h2></td></tr><tr><td colspan="2"><div class="pedigree-box"><span class="pedigree-label father-label">父</span><div><div class="pedigree-name">${data.father || '-'}</div></div></div></td></tr><tr><td colspan="2"><div class="pedigree-box"><span class="pedigree-label mother-label">母</span><div><div class="pedigree-name">${data.mother || '-'}</div><div class="pedigree-sire">母父: ${data.bms || '-'}</div></div></div></td></tr><tr><th>性齢</th><td>${data.sexAge || '-'}</td></tr><tr><th>所属</th><td>${affiliation || '-'}</td></tr><tr><th>馬主</th><td>${data.owner || '-'}</td></tr><tr><th>生産者</th><td>${data.breeder || '-'}</td></tr><tr><th>通算成績</th><td>${data.totalResults || '-'}</td></tr><tr><th>主な勝ち鞍</th><td>${data.mainWin || '-'}</td></tr><tr><th>生年月日</th><td>${data.birthday ? new Date(data.birthday + 'T00:00:00').toLocaleDateString('ja-JP') : '-'}</td></tr><tr><th>馬名の意味</th><td>${data.meaning || '-'}</td></tr><tr><th>次走予定</th><td>${data.nextRace || '-'}</td></tr>`;
-            } else {
-                const dorm = [data.dormSelect, data.dormText].filter(Boolean).join(' ');
-                html = `<tr><td colspan="2"><h2>${data.name || '名前'} <small>${data.nameEn || ''}</small></h2></td></tr><tr><th>耳飾り</th><td>${data.ear || '-'}</td></tr><tr><th>学年</th><td>${data.grade || '-'}</td></tr><tr><th>所属寮</th><td>${dorm || '-'}</td></tr><tr><th>通算成績</th><td>${data.totalResults || '-'}</td></tr><tr><th>主な勝ち鞍</th><td>${data.mainWin || '-'}</td></tr><tr><th>生年月日</th><td>${data.birthday ? new Date(data.birthday + 'T00:00:00').toLocaleDateString('ja-JP') : '-'}</td></tr><tr><th>名前の意味</th><td>${data.meaning || '-'}</td></tr><tr><th>次走予定</th><td>${data.nextRace || '-'}</td></tr>`;
+            const fileName = `${fileNameBase || 'profile'}_${suffix}.png`;
+            
+            const wrapper = document.createElement('div');
+            wrapper.classList.add('export-clone');
+            
+            const contentClone = targetElement.cloneNode(true);
+            wrapper.appendChild(contentClone);
+            
+            document.body.appendChild(wrapper);
+            showToast('画像を生成中です...');
+            
+            try {
+                await nextFrame();
+                const canvas = await html2canvas(wrapper, { scale: 2 });
+                const a = document.createElement('a');
+                a.href = canvas.toDataURL('image/png');
+                a.download = fileName;
+                a.click();
+                showToast('画像の生成が完了しました。');
+            } catch (error) {
+                console.error('画像生成に失敗しました:', error);
+                showToast('エラー: 画像の生成に失敗しました。');
+            } finally {
+                document.body.removeChild(wrapper);
             }
-            container.innerHTML = html;
         }
-        function updateResultsPreview() {
-            const tbody = document.getElementById('preview-results-table');
-            tbody.innerHTML = '';
-            appData.races.forEach((race, index) => {
-                const gradeClass = getGradeClass(race.grade);
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${race.date || '-'}<br>${race.course || '-'}</td><td class="race-name">${race.name || '-'} <span class="race-grade ${gradeClass}">${race.grade || ''}</span></td><td>${race.pop || '-'}</td><td>${race.rank || '-'}</td><td>${race.jockey || '-'}</td><td>${race.weight || '-'}</td><td>${race.odds || '-'}</td><td>${race.distance || '-'}</td><td><div class="action-buttons"><button class="btn btn-edit" data-index="${index}">編集</button><button class="btn btn-delete" data-index="${index}">削除</button></div></td>`;
-                tbody.appendChild(tr);
-            });
-        }
-        const raceFormIds = ['race-date', 'race-course', 'race-name', 'race-grade', 'race-pop', 'race-rank', 'race-jockey', 'race-weight', 'race-odds', 'race-distance'];
+        // ▲▲▲▲▲ 修正点 ▲▲▲▲▲
+        
+        function showToast(message) { const container = document.getElementById('toast-container'); const toast = document.createElement('div'); toast.className = 'toast-message'; toast.textContent = message; container.appendChild(toast); setTimeout(() => toast.classList.add('show'), 100); setTimeout(() => { toast.classList.remove('show'); toast.addEventListener('transitionend', () => toast.remove()); }, 3000); }
+        function calculateTotals() { let wins = [0, 0, 0, 0, 0, 0], totalPrize = 0, totalFans = 0; appData.races.forEach(race => { const rank = parseInt(race.rank, 10); if (rank > 0 && rank <= 5) wins[rank-1]++; else wins[5]++; totalPrize += parseInt(race.prize, 10) || 0; totalFans += parseInt(race.fans, 10) || 0; }); const totalRaces = appData.races.length; const resultsStr = `${totalRaces}戦${wins[0]}勝 [${wins[1]}-${wins[2]}-${wins[3]}-${wins[4]}-${wins[5]}]`; document.getElementById('f-totalResults').value = resultsStr; document.getElementById('o-totalResults').value = resultsStr; document.getElementById('f-totalPrize').value = formatPrize(totalPrize); document.getElementById('o-totalFans').value = formatFans(totalFans); }
+        function formatPrize(amount) { if (amount === 0) return '0万円'; if (amount < 10000) return `${amount.toLocaleString()}万円`; const oku = Math.floor(amount / 10000); const man = amount % 10000; return man === 0 ? `${oku}億円` : `${oku}億${man.toLocaleString()}万円`; }
+        function formatFans(amount) { return `${amount.toLocaleString()}人`; }
+        function updateAllViews() { calculateTotals(); updateFormVisibility(); updateBasicInfoPreview(); updateResultsPreview(); }
+        function updateFormVisibility() { const isFictional = appData.mode === 'fictional'; document.getElementById('form-fictional').style.display = isFictional ? 'block' : 'none'; document.getElementById('form-original').style.display = isFictional ? 'none' : 'block'; document.getElementById('race-prize-group').style.display = isFictional ? 'block' : 'none'; document.getElementById('race-fans-group').style.display = isFictional ? 'none' : 'block'; }
+        function updateBasicInfoPreview() { const container = document.getElementById('preview-basic-info'); const data = appData[appData.mode]; let html = ''; if (appData.mode === 'fictional') { const affiliation = [data.affiliationSelect, data.affiliationText].filter(Boolean).join(' '); html = `<tr><td colspan="2"><h2>${data.horseName || '馬名'} <small>${data.horseNameEn || ''}</small></h2></td></tr><tr><td colspan="2"><div class="pedigree-box"><span class="pedigree-label father-label">父</span><div><div class="pedigree-name">${data.father || '-'}</div></div></div></td></tr><tr><td colspan="2"><div class="pedigree-box"><span class="pedigree-label mother-label">母</span><div><div class="pedigree-name">${data.mother || '-'}</div><div class="pedigree-sire">母父: ${data.bms || '-'}</div></div></div></td></tr><tr><th>性齢</th><td>${data.sexAge || '-'}</td></tr><tr><th>所属</th><td>${affiliation || '-'}</td></tr><tr><th>馬主</th><td>${data.owner || '-'}</td></tr><tr><th>生産者</th><td>${data.breeder || '-'}</td></tr><tr><th>通算成績</th><td>${document.getElementById('f-totalResults').value || '-'}</td></tr><tr><th>総獲得賞金</th><td>${document.getElementById('f-totalPrize').value || '-'}</td></tr><tr><th>主な勝ち鞍</th><td>${data.mainWin || '-'}</td></tr><tr><th>生年月日</th><td>${data.birthday ? new Date(data.birthday + 'T00:00:00').toLocaleDateString('ja-JP') : '-'}</td></tr><tr><th>馬名の意味</th><td>${data.meaning || '-'}</td></tr><tr><th>次走予定</th><td>${data.nextRace || '-'}</td></tr>`; } else { const dorm = [data.dormSelect, data.dormText].filter(Boolean).join(' '); html = `<tr><td colspan="2"><h2>${data.name || '名前'} <small>${data.nameEn || ''}</small></h2></td></tr><tr><th>耳飾り</th><td>${data.ear || '-'}</td></tr><tr><th>学年</th><td>${data.grade || '-'}</td></tr><tr><th>所属寮</th><td>${dorm || '-'}</td></tr><tr><th>通算成績</th><td>${document.getElementById('o-totalResults').value || '-'}</td></tr><tr><th>累計ファン数</th><td>${document.getElementById('o-totalFans').value || '-'}</td></tr><tr><th>主な勝ち鞍</th><td>${data.mainWin || '-'}</td></tr><tr><th>生年月日</th><td>${data.birthday ? new Date(data.birthday + 'T00:00:00').toLocaleDateString('ja-JP') : '-'}</td></tr><tr><th>名前の意味</th><td>${data.meaning || '-'}</td></tr><tr><th>次走予定</th><td>${data.nextRace || '-'}</td></tr>`; } container.innerHTML = html; }
+        function updateResultsPreview() { const tbody = document.getElementById('preview-results-table'); tbody.innerHTML = ''; appData.races.forEach((race, index) => { const gradeClass = getGradeClass(race.grade); const tr = document.createElement('tr'); tr.innerHTML = `<td>${race.date || '-'}<br>${race.course || '-'}</td><td class="race-name">${race.name || '-'} <span class="race-grade ${gradeClass}">${race.grade || ''}</span></td><td>${race.distance || '-'}</td><td>${race.pop || '-'}</td><td>${race.rank || '-'}</td><td>${race.jockey || '-'}</td><td>${race.weight || '-'}</td><td>${race.odds || '-'}</td><td><div class="action-buttons"><button class="btn btn-edit" data-index="${index}">編集</button><button class="btn btn-delete" data-index="${index}">削除</button></div></td>`; tbody.appendChild(tr); }); }
+        const raceFormIds = ['race-date', 'race-course', 'race-name', 'race-grade', 'race-distance', 'race-pop', 'race-rank', 'race-jockey', 'race-weight', 'race-odds', 'race-prize', 'race-fans'];
         function getRaceFormValues() { const v={}; raceFormIds.forEach(id=>v[id.replace('race-','')]=document.getElementById(id).value); return v; }
         function setRaceFormValues(data) { raceFormIds.forEach(id=>document.getElementById(id).value = data[id.replace('race-','')] || ''); }
         function resetRaceForm() { editingIndex = null; addRaceBtn.textContent = '成績を追加'; addRaceBtn.classList.replace('btn-success', 'btn-primary'); raceFormIds.forEach(id => { document.getElementById(id).value = ''; }); }
-        function loadDataIntoForms() {
-            document.querySelector(`input[name="mode"][value="${appData.mode}"]`).checked = true;
-            Object.keys(appData.fictional).forEach(k => { const e = document.getElementById(`f-${k}`); if(e) e.value = appData.fictional[k]; });
-            Object.keys(appData.original).forEach(k => { const e = document.getElementById(`o-${k}`); if(e) e.value = appData.original[k]; });
-        }
+        function loadDataIntoForms() { document.querySelector(`input[name="mode"][value="${appData.mode}"]`).checked = true; Object.keys(appData.fictional).forEach(k => { const e = document.getElementById(`f-${k}`); if(e && !e.readOnly) e.value = appData.fictional[k]; }); Object.keys(appData.original).forEach(k => { const e = document.getElementById(`o-${k}`); if(e && !e.readOnly) e.value = appData.original[k]; }); }
         function getGradeClass(g) { if (g === 'GⅠ') return 'grade-g1'; if (g === 'GⅡ') return 'grade-g2'; if (g === 'GⅢ') return 'grade-g3'; if (g === 'L') return 'grade-l'; return 'grade-other'; }
         updateAllViews();
     });
