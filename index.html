@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>競走馬・オリウマ プロフィールメーカー v0.03.04</title>
+    <title>競走馬・オリウマ プロフィールメーカー v0.03.02</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root { --color-father: #004098; --color-mother: #e60012; --color-text: #333; --color-bg-light: #f7f7f7; --color-border: #ddd; --color-header-bg: #f0f0f0; --color-gi: #004098; --color-gii: #e60012; --color-giii: #009944; --color-listed: #660099; --color-edit: #007bff; --color-delete: #dc3545; --color-success: #28a745; }
@@ -52,9 +52,18 @@
         .race-grade { display: inline-block; padding: 2px 6px; color: white; border-radius: 4px; font-size: 10px; margin-left: 5px; }
         .grade-g1 { background-color: var(--color-gi); } .grade-g2 { background-color: var(--color-gii); } .grade-g3 { background-color: var(--color-giii); } .grade-l { background-color: var(--color-listed); } .grade-op, .grade-other { background-color: #6c757d; }
         .action-buttons { display: flex; gap: 5px; justify-content: center; }
-        .export-clone { position: absolute; left: -9999px; top: 0; width: 1200px !important; background-color: white; z-index: -1; }
-        .export-clone .profile-table,
-        .export-clone .results-table { table-layout: fixed; width: 100%; }
+        
+        /* ▼▼▼▼▼ 追加 ▼▼▼▼▼ */
+        .export-clone {
+            position: absolute;
+            left: -9999px;
+            top: 0;
+            width: 1200px !important;
+            background-color: white;
+            z-index: -1;
+        }
+        /* ▲▲▲▲▲ 追加 ▲▲▲▲▲ */
+
         @media (max-width: 900px) { .container { flex-direction: column; } .preview-area { margin-top: 0; } #responsive-message { display: block; } }
     </style>
 </head>
@@ -174,24 +183,17 @@
         function saveToJson() { const dataStr = JSON.stringify(appData, null, 2); const blob = new Blob([dataStr], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); const fileNameBase = appData.mode === 'fictional' ? appData.fictional.horseName : appData.original.name; a.download = `${fileNameBase || 'profile'}.json`; a.href = url; a.click(); URL.revokeObjectURL(url); }
         function loadFromJson(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (event) => { try { const loadedData = JSON.parse(event.target.result); appData = { ...createInitialData(), ...loadedData }; appData.races = appData.races.map(r => ({ ...{ prize: 0, fans: 0 }, ...r })); resetRaceForm(); loadDataIntoForms(); updateAllViews(); showToast('データの読み込みが完了しました。'); } catch (err) { alert('ファイルの読み込みに失敗しました。'); console.error(err); } }; reader.readAsText(file); e.target.value = ''; }
         
-        // ▼▼▼▼▼ 修正点 ▼▼▼▼▼
         function nextFrame() { return new Promise(resolve => { requestAnimationFrame(resolve); }); }
         async function exportImage(targetElement, suffix) {
             const fileNameBase = appData.mode === 'fictional' ? appData.fictional.horseName : appData.original.name;
             const fileName = `${fileNameBase || 'profile'}_${suffix}.png`;
-            
-            const wrapper = document.createElement('div');
-            wrapper.classList.add('export-clone');
-            
-            const contentClone = targetElement.cloneNode(true);
-            wrapper.appendChild(contentClone);
-            
-            document.body.appendChild(wrapper);
+            const clone = targetElement.cloneNode(true);
+            clone.classList.add('export-clone');
+            document.body.appendChild(clone);
             showToast('画像を生成中です...');
-            
             try {
                 await nextFrame();
-                const canvas = await html2canvas(wrapper, { scale: 2 });
+                const canvas = await html2canvas(clone, { scale: 2 });
                 const a = document.createElement('a');
                 a.href = canvas.toDataURL('image/png');
                 a.download = fileName;
@@ -201,10 +203,9 @@
                 console.error('画像生成に失敗しました:', error);
                 showToast('エラー: 画像の生成に失敗しました。');
             } finally {
-                document.body.removeChild(wrapper);
+                document.body.removeChild(clone);
             }
         }
-        // ▲▲▲▲▲ 修正点 ▲▲▲▲▲
         
         function showToast(message) { const container = document.getElementById('toast-container'); const toast = document.createElement('div'); toast.className = 'toast-message'; toast.textContent = message; container.appendChild(toast); setTimeout(() => toast.classList.add('show'), 100); setTimeout(() => { toast.classList.remove('show'); toast.addEventListener('transitionend', () => toast.remove()); }, 3000); }
         function calculateTotals() { let wins = [0, 0, 0, 0, 0, 0], totalPrize = 0, totalFans = 0; appData.races.forEach(race => { const rank = parseInt(race.rank, 10); if (rank > 0 && rank <= 5) wins[rank-1]++; else wins[5]++; totalPrize += parseInt(race.prize, 10) || 0; totalFans += parseInt(race.fans, 10) || 0; }); const totalRaces = appData.races.length; const resultsStr = `${totalRaces}戦${wins[0]}勝 [${wins[1]}-${wins[2]}-${wins[3]}-${wins[4]}-${wins[5]}]`; document.getElementById('f-totalResults').value = resultsStr; document.getElementById('o-totalResults').value = resultsStr; document.getElementById('f-totalPrize').value = formatPrize(totalPrize); document.getElementById('o-totalFans').value = formatFans(totalFans); }
