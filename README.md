@@ -1,6 +1,6 @@
 # 競走馬・オリウマ プロフィールメーカー
 [ツール本体はこちらからどうぞ](https://tank-x3.github.io/Horses_Profiles_Maker/index.html)
-
+[ツールの開発ログ（AIチャットでの作業）に興味がある方はこちら](https://tank-x3.github.io/Horses_Profiles_Maker/making_log.html)
 ## 概要
 
 架空の競走馬や『ウマ娘』の二次創作キャラクター（オリウマ）のプロフィールと競走成績を簡単に入力・管理し、`netkeiba`風のレイアウトで表示・画像出力できるWebツールです。
