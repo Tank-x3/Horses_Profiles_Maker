@@ -1,5 +1,5 @@
 # 競走馬・オリウマ プロフィールメーカー
-[ツール本体はこちらからどうぞ](https://tank-x3.github.io/Horses_Profiles_Maker/index.html)
+[ツール本体はこちらからどうぞ](https://tank-x3.github.io/Horses_Profiles_Maker/index.html)  
 [ツールの開発ログ（AIチャットでの作業）に興味がある方はこちら](https://tank-x3.github.io/Horses_Profiles_Maker/making_log.html)
 ## 概要
 
