@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>競走馬・オリウマ プロフィールメーカー v1.0</title>
+    <title>競走馬・オリウマ プロフィールメーカー v1.1</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root { --color-father: #004098; --color-mother: #e60012; --color-text: #333; --color-bg-light: #f7f7f7; --color-border: #ddd; --color-header-bg: #f0f0f0; --color-gi: #004098; --color-gii: #e60012; --color-giii: #009944; --color-listed: #660099; --color-edit: #007bff; --color-delete: #dc3545; --color-success: #28a745; }
@@ -67,7 +67,7 @@
 </head>
 <body>
     <header class="page-header">
-        <h1>競走馬・オリウマ プロフィールメーカー<span class="version">v1.0</span></h1>
+        <h1>競走馬・オリウマ プロフィールメーカー<span class="version">v1.1</span></h1>
         <a href="https://github.com/Tank-x3/Horses_Profiles_Maker" target="_blank" rel="noopener noreferrer" class="github-link">
             <svg viewBox="0 0 16 16" version="1.1" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
             <span>GitHub (使い方/Readme)</span>
@@ -139,7 +139,14 @@
                 <div class="form-group"><label for="race-date">開催日</label><input type="text" id="race-date" placeholder="22/06/05"></div>
                 <div class="form-group"><label for="race-course">開催地</label><input type="text" id="race-course" placeholder="東京11R"></div>
                 <div class="form-group"><label for="race-name">レース名</label><input type="text" id="race-name"></div>
-                <div class="form-group"><label for="race-grade">格付け</label><select id="race-grade"><option value="GⅠ">GⅠ</option><option value="GⅡ">GⅡ</option><option value="GⅢ">GⅢ</option><option value="L">L</option><option value="OP">OP</option><option value="3勝">3勝</option><option value="2勝">2勝</option><option value="1勝">1勝</option><option value="未勝利">未勝利</option><option value="新馬">新馬</option><option value="その他">その他</option></select></div>
+                <div class="form-group"><label for="race-grade">格付け</label>
+                    <select id="race-grade">
+                        <option value="GⅠ">GⅠ</option><option value="JpnⅠ">JpnⅠ</option><option value="J・GⅠ">J・GⅠ</option>
+                        <option value="GⅡ">GⅡ</option><option value="JpnⅡ">JpnⅡ</option><option value="J・GⅡ">J・GⅡ</option>
+                        <option value="GⅢ">GⅢ</option><option value="JpnⅢ">JpnⅢ</option><option value="J・GⅢ">J・GⅢ</option>
+                        <option value="L">L</option><option value="OP">OP</option><option value="3勝">3勝</option><option value="2勝">2勝</option><option value="1勝">1勝</option><option value="未勝利">未勝利</option><option value="新馬">新馬</option><option value="その他">その他</option>
+                    </select>
+                </div>
                 <div class="form-group"><label for="race-distance">距離</label><input type="text" id="race-distance" placeholder="芝2400m"></div>
                 <div class="form-row">
                     <div class="form-group"><label for="race-pop">人気</label><input type="number" id="race-pop" min="1"></div>
@@ -301,7 +308,14 @@
         function setRaceFormValues(data) { raceFormIds.forEach(id=>document.getElementById(id).value = data[id.replace('race-','')] || ''); }
         function resetRaceForm() { editingIndex = null; addRaceBtn.textContent = '成績を追加'; addRaceBtn.classList.replace('btn-success', 'btn-primary'); raceFormIds.forEach(id => { document.getElementById(id).value = ''; }); }
         function loadDataIntoForms() { document.querySelector(`input[name="mode"][value="${appData.mode}"]`).checked = true; Object.keys(appData.fictional).forEach(k => { const e = document.getElementById(`f-${k}`); if(e && !e.readOnly) e.value = appData.fictional[k]; }); Object.keys(appData.original).forEach(k => { const e = document.getElementById(`o-${k}`); if(e && !e.readOnly) e.value = appData.original[k]; }); }
-        function getGradeClass(g) { if (g === 'GⅠ') return 'grade-g1'; if (g === 'GⅡ') return 'grade-g2'; if (g === 'GⅢ') return 'grade-g3'; if (g === 'L') return 'grade-l'; return 'grade-other'; }
+        function getGradeClass(g) {
+            if (!g) return 'grade-other';
+            if (g.includes('Ⅰ')) return 'grade-g1';
+            if (g.includes('Ⅱ')) return 'grade-g2';
+            if (g.includes('Ⅲ')) return 'grade-g3';
+            if (g === 'L') return 'grade-l';
+            return 'grade-other';
+        }
         updateAllViews();
     });
     </script>
