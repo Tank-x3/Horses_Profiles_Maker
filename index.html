@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>競走馬・オリウマ プロフィールメーカー v1.1</title>
+    <title>競走馬・オリウマ プロフィールメーカー v1.2</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root { --color-father: #004098; --color-mother: #e60012; --color-text: #333; --color-bg-light: #f7f7f7; --color-border: #ddd; --color-header-bg: #f0f0f0; --color-gi: #004098; --color-gii: #e60012; --color-giii: #009944; --color-listed: #660099; --color-edit: #007bff; --color-delete: #dc3545; --color-success: #28a745; }
@@ -61,13 +61,20 @@
         .grade-g1 { background-color: var(--color-gi); } .grade-g2 { background-color: var(--color-gii); } .grade-g3 { background-color: var(--color-giii); } .grade-l { background-color: var(--color-listed); } .grade-op, .grade-other { background-color: #6c757d; }
         .action-buttons { display: flex; gap: 5px; justify-content: center; }
         .export-clone { position: absolute; left: -9999px; top: 0; width: 1200px !important; background-color: white; z-index: -1; }
+        
+        /* ▼▼▼▼▼ 差し替え ▼▼▼▼▼ */
+        .cell-rank-1 { background-color: #ffea80; } /* Gold (黄色味を強化) */
+        .cell-rank-2 { background-color: #b3e5fc; } /* Silver -> Light Blue */
+        .cell-rank-3 { background-color: #ffcc80; } /* Bronze (確定) */
+        /* ▲▲▲▲▲ 差し替え ▲▲▲▲▲ */
+
         @media (max-width: 900px) { .container { flex-direction: column; margin-top: 10px; } }
         @media (max-width: 600px) { .page-header { flex-direction: column; gap: 10px; } }
     </style>
 </head>
 <body>
     <header class="page-header">
-        <h1>競走馬・オリウマ プロフィールメーカー<span class="version">v1.1</span></h1>
+        <h1>競走馬・オリウマ プロフィールメーカー<span class="version">v1.2</span></h1>
         <a href="https://github.com/Tank-x3/Horses_Profiles_Maker" target="_blank" rel="noopener noreferrer" class="github-link">
             <svg viewBox="0 0 16 16" version="1.1" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
             <span>GitHub (使い方/Readme)</span>
@@ -294,11 +301,13 @@
             tbody.innerHTML = '';
             appData.races.forEach((race, index) => {
                 const gradeClass = getGradeClass(race.grade);
+                const popClass = getRankClass(race.pop);
+                const rankClass = getRankClass(race.rank);
                 const tr = document.createElement('tr');
                 if (isFictional) {
-                    tr.innerHTML = `<td>${race.date || '-'}<br>${race.course || '-'}</td><td class="race-name">${race.name || '-'} <span class="race-grade ${gradeClass}">${race.grade || ''}</span></td><td>${race.distance || '-'}</td><td>${race.pop || '-'}</td><td>${race.rank || '-'}</td><td>${race.jockey || '-'}</td><td>${race.weight || '-'}</td><td>${race.odds || '-'}</td><td><div class="action-buttons"><button class="btn btn-edit" data-index="${index}">編集</button><button class="btn btn-delete" data-index="${index}">削除</button></div></td>`;
+                    tr.innerHTML = `<td>${race.date || '-'}<br>${race.course || '-'}</td><td class="race-name">${race.name || '-'} <span class="race-grade ${gradeClass}">${race.grade || ''}</span></td><td>${race.distance || '-'}</td><td class="${popClass}">${race.pop || '-'}</td><td class="${rankClass}">${race.rank || '-'}</td><td>${race.jockey || '-'}</td><td>${race.weight || '-'}</td><td>${race.odds || '-'}</td><td><div class="action-buttons"><button class="btn btn-edit" data-index="${index}">編集</button><button class="btn btn-delete" data-index="${index}">削除</button></div></td>`;
                 } else {
-                    tr.innerHTML = `<td>${race.date || '-'}<br>${race.course || '-'}</td><td class="race-name">${race.name || '-'} <span class="race-grade ${gradeClass}">${race.grade || ''}</span></td><td>${race.distance || '-'}</td><td>${race.pop || '-'}</td><td>${race.rank || '-'}</td><td>${race.odds || '-'}</td><td><div class="action-buttons"><button class="btn btn-edit" data-index="${index}">編集</button><button class="btn btn-delete" data-index="${index}">削除</button></div></td>`;
+                    tr.innerHTML = `<td>${race.date || '-'}<br>${race.course || '-'}</td><td class="race-name">${race.name || '-'} <span class="race-grade ${gradeClass}">${race.grade || ''}</span></td><td>${race.distance || '-'}</td><td class="${popClass}">${race.pop || '-'}</td><td class="${rankClass}">${race.rank || '-'}</td><td>${race.odds || '-'}</td><td><div class="action-buttons"><button class="btn btn-edit" data-index="${index}">編集</button><button class="btn btn-delete" data-index="${index}">削除</button></div></td>`;
                 }
                 tbody.appendChild(tr);
             });
@@ -315,6 +324,13 @@
             if (g.includes('Ⅲ')) return 'grade-g3';
             if (g === 'L') return 'grade-l';
             return 'grade-other';
+        }
+        function getRankClass(rank) {
+            const rankNum = parseInt(rank, 10);
+            if (rankNum === 1) return 'cell-rank-1';
+            if (rankNum === 2) return 'cell-rank-2';
+            if (rankNum === 3) return 'cell-rank-3';
+            return '';
         }
         updateAllViews();
     });
