@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>競走馬・オリウマ プロフィールメーカー v1.3.2</title>
+    <title>競走馬・オリウマ プロフィールメーカー v1.4</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             /* Light Theme Colors */
             --bg-page: #f0f2f5; --bg-container: #ffffff; --bg-light: #f7f7f7; --bg-header: #f0f0f0; --text-primary: #333333; --text-secondary: #666666; --border-color: #dddddd;
-            --color-father: #004098; --color-mother: #e60012; --color-g1: #004098; --color-g2: #e60012; --color-g3: #009944; --color-listed: #660099; --color-other: #6c757d; --color-edit: #007bff; --color-delete: #dc3545; --color-success: #28a745;
+            --color-father: #004098; --color-mother: #e60012; --color-g1: #004098; --color-g2: #e60012; --color-g3: #009944; --color-listed: #660099; --color-other: #6c757d; --color-edit: #007bff; --color-delete: #dc3545; --color-success: #28a745; --color-insert: #17a2b8;
             --rank1-bg: #ffea80; --rank2-bg: #b3e5fc; --rank3-bg: #ffcc80;
         }
 
         body.dark-mode {
             /* Dark Theme Colors */
             --bg-page: #121212; --bg-container: #1e1e1e; --bg-light: #2c2c2e; --bg-header: #2c2c2e; --text-primary: #e0e0e0; --text-secondary: #aaaaaa; --border-color: #444444;
-            --color-father: #58a6ff; --color-mother: #ff7b72; --color-g1: #58a6ff; --color-g2: #ff7b72; --color-g3: #56d364; --color-listed: #c678dd; --color-other: #8b949e; --color-edit: #58a6ff; --color-delete: #ff7b72; --color-success: #56d364;
+            --color-father: #58a6ff; --color-mother: #ff7b72; --color-g1: #58a6ff; --color-g2: #ff7b72; --color-g3: #56d364; --color-listed: #c678dd; --color-other: #8b949e; --color-edit: #58a6ff; --color-delete: #ff7b72; --color-success: #56d364; --color-insert: #20c997;
             --rank1-bg: #ffd700; --rank2-bg: #58a6ff; --rank3-bg: #cd7f32;
         }
         
@@ -41,7 +41,7 @@
         .btn { padding: 8px 12px; border: none; border-radius: 4px; color: white; cursor: pointer; transition: opacity 0.2s; font-size: 12px; }
         .btn:hover { opacity: 0.8; }
         .btn-primary { background-color: var(--color-father); } .btn-success { background-color: var(--color-success); }
-        .btn-edit { background-color: var(--color-edit); } .btn-delete { background-color: var(--color-delete); }
+        .btn-edit { background-color: var(--color-edit); } .btn-delete { background-color: var(--color-delete); } .btn-insert { background-color: var(--color-insert); } .btn-cancel { background-color: var(--color-other); }
         .io-buttons { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
         #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
         .toast-message { background-color: var(--color-success); color: white; padding: 15px; border-radius: 5px; margin-bottom: 10px; opacity: 0; transform: translateX(100%); transition: all 0.4s ease-in-out; }
@@ -76,6 +76,8 @@
         .action-buttons { display: flex; gap: 5px; justify-content: center; }
         .export-clone { position: absolute; left: -9999px; top: 0; width: 1200px !important; z-index: -1; }
         .cell-rank-1 { background-color: var(--rank1-bg); } .cell-rank-2 { background-color: var(--rank2-bg); } .cell-rank-3 { background-color: var(--rank3-bg); }
+        .placeholder-row td { background-color: #e9f5ff; color: #004098; text-align: center; font-style: italic; padding: 15px 0; }
+        body.dark-mode .placeholder-row td { background-color: #2a3a4a; color: #58a6ff; }
         
         body.dark-mode .pedigree-label,
         body.dark-mode .race-grade,
@@ -102,7 +104,7 @@
         <svg class="moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11.99 2.007a9.993 9.993 0 0 1 8.12 15.47a.75.75 0 0 0-.012 1.06a.75.75 0 0 0 1.06.013A11.492 11.492 0 0 0 12.001 0C5.372 0 0 5.373 0 12a11.492 11.492 0 0 0 4.542 9.475a.75.75 0 0 0 1.06-.012a.75.75 0 0 0-.012-1.06A9.993 9.993 0 0 1 3.007 12A9.993 9.993 0 0 1 11.99 2.007Z"/></svg>
     </button>
     <header class="page-header">
-        <h1>競走馬・オリウマ プロフィールメーカー<span class="version">v1.3.2</span></h1>
+        <h1>競走馬・オリウマ プロフィールメーカー<span class="version">v1.4</span></h1>
         <a href="https://github.com/Tank-x3/Horses_Profiles_Maker" target="_blank" rel="noopener noreferrer" class="github-link">
             <svg viewBox="0 0 16 16" version="1.1" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
             <span>GitHub (使い方/Readme)</span>
@@ -195,6 +197,7 @@
                 <div class="form-group" id="race-prize-group"><label for="race-prize">獲得賞金(万円)</label><input type="number" id="race-prize" min="0" placeholder="0"></div>
                 <div class="form-group" id="race-fans-group" style="display:none;"><label for="race-fans">獲得ファン数</label><input type="number" id="race-fans" min="0" placeholder="0"></div>
                 <button id="add-race-btn" class="btn btn-primary">成績を追加</button>
+                <button id="cancel-insert-btn" class="btn btn-cancel" style="display: none; width: 100%; margin-top: 10px;">挿入をキャンセル</button>
             </div>
         </div>
         <div class="preview-area" id="preview-area">
@@ -214,11 +217,11 @@
     document.addEventListener('DOMContentLoaded', () => {
         let appData = createInitialData();
         let editingIndex = null;
+        let insertionIndex = null;
         function createInitialData() { return { mode: 'fictional', fictional: { horseName: '', horseNameEn: '', father: '', mother: '', bms: '', sexAge: '', affiliationSelect: '美浦', affiliationText: '', owner: '', breeder: '', totalResults: '', totalPrize: '', mainWin: '', birthday: '', meaning: '', nextRace: '' }, original: { name: '', nameEn: '', ear: '右', grade: '中等部', dormSelect: '美浦', dormText: '', totalResults: '', totalFans: '', mainWin: '', birthday: '', meaning: '', nextRace: '' }, races: [] }; }
-        const inputArea = document.querySelector('.input-area');
         const addRaceBtn = document.getElementById('add-race-btn');
-        inputArea.addEventListener('change', handleInputChange);
-        inputArea.addEventListener('input', handleInputChange);
+        document.querySelector('.input-area').addEventListener('change', handleInputChange);
+        document.querySelector('.input-area').addEventListener('input', handleInputChange);
         addRaceBtn.addEventListener('click', handleAddOrUpdateRace);
         document.getElementById('save-json-btn').addEventListener('click', saveToJson);
         document.getElementById('load-json-btn').addEventListener('click', () => document.getElementById('json-file-input').click());
@@ -227,6 +230,7 @@
         document.getElementById('export-all-btn').addEventListener('click', () => exportImage(document.getElementById('preview-area'), 'all'));
         document.getElementById('export-profile-btn').addEventListener('click', () => exportImage(document.getElementById('profile-preview-box'), 'profile'));
         document.getElementById('export-results-btn').addEventListener('click', () => exportImage(document.getElementById('results-preview-box'), 'results'));
+        document.getElementById('cancel-insert-btn').addEventListener('click', cancelInsertionMode);
 
         const themeToggle = document.getElementById('theme-toggle');
         const body = document.body;
@@ -238,10 +242,8 @@
         
         function validateRaceData(data) {
             const errors = [];
-            const pop = parseInt(data.pop, 10);
-            const rank = parseInt(data.rank, 10);
-            const prize = parseInt(data.prize, 10);
-            const fans = parseInt(data.fans, 10);
+            const pop = parseInt(data.pop, 10); const rank = parseInt(data.rank, 10);
+            const prize = parseInt(data.prize, 10); const fans = parseInt(data.fans, 10);
             if (data.pop && pop <= 0) { errors.push("・人気は1以上の整数で入力してください。"); }
             if (data.rank && rank <= 0) { errors.push("・着順は1以上の整数で入力してください。"); }
             if (data.prize && prize < 0) { errors.push("・獲得賞金は0以上の整数で入力してください。"); }
@@ -250,9 +252,27 @@
             return true;
         }
 
-        function handleAddOrUpdateRace() { const raceData = getRaceFormValues(); if (!validateRaceData(raceData)) { return; } if (editingIndex !== null) { appData.races[editingIndex] = raceData; } else { appData.races.unshift(raceData); } resetRaceForm(); updateAllViews(); }
-        function handleRaceAction(e) { const target = e.target.closest('button'); if (!target) return; const index = parseInt(target.dataset.index, 10); if (target.classList.contains('btn-edit')) { startEditingRace(index); } else if (target.classList.contains('btn-delete')) { deleteRace(index); } }
-        function startEditingRace(index) { editingIndex = index; setRaceFormValues(appData.races[index]); addRaceBtn.textContent = '成績を更新'; addRaceBtn.classList.replace('btn-primary', 'btn-success'); document.getElementById('race-form-header').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        function handleAddOrUpdateRace() {
+            const raceData = getRaceFormValues(); 
+            if (!validateRaceData(raceData)) { return; } 
+            if (editingIndex !== null) { appData.races[editingIndex] = raceData; } 
+            else if (insertionIndex !== null) { appData.races.splice(insertionIndex, 0, raceData); } 
+            else { appData.races.unshift(raceData); } 
+            resetRaceForm(); 
+            updateAllViews(); 
+        }
+
+        function handleRaceAction(e) { 
+            const target = e.target.closest('button'); 
+            if (!target) return; 
+            const index = parseInt(target.dataset.index, 10); 
+            if (target.classList.contains('btn-edit')) { startEditingMode(index); } 
+            else if (target.classList.contains('btn-delete')) { deleteRace(index); }
+            else if (target.classList.contains('btn-insert')) { startInsertionMode(index); }
+        }
+        function startEditingMode(index) { resetRaceForm(false); editingIndex = index; setRaceFormValues(appData.races[index]); addRaceBtn.textContent = '成績を更新'; addRaceBtn.classList.replace('btn-primary', 'btn-success'); document.getElementById('race-form-header').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        function startInsertionMode(index) { resetRaceForm(false); insertionIndex = index + 1; addRaceBtn.textContent = 'この位置に挿入'; addRaceBtn.classList.replace('btn-primary', 'btn-success'); document.getElementById('cancel-insert-btn').style.display = 'block'; updateResultsPreview(); document.getElementById('race-form-header').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        function cancelInsertionMode() { resetRaceForm(); updateResultsPreview(); }
         function deleteRace(index) { if (confirm('このレース成績を削除しますか？')) { appData.races.splice(index, 1); resetRaceForm(); updateAllViews(); } }
         function saveToJson() { const dataStr = JSON.stringify(appData, null, 2); const blob = new Blob([dataStr], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); const fileNameBase = appData.mode === 'fictional' ? appData.fictional.horseName : appData.original.name; a.download = `${fileNameBase || 'profile'}.json`; a.href = url; a.click(); URL.revokeObjectURL(url); }
         function loadFromJson(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (event) => { try { const loadedData = JSON.parse(event.target.result); appData = { ...createInitialData(), ...loadedData }; appData.races = appData.races.map(r => ({ ...{ prize: 0, fans: 0 }, ...r })); resetRaceForm(); loadDataIntoForms(); updateAllViews(); showToast('データの読み込みが完了しました。'); } catch (err) { alert('ファイルの読み込みに失敗しました。'); console.error(err); } }; reader.readAsText(file); e.target.value = ''; }
@@ -261,102 +281,64 @@
         async function exportImage(targetElement, suffix) {
             const fileNameBase = appData.mode === 'fictional' ? appData.fictional.horseName : appData.original.name;
             const fileName = `${fileNameBase || 'profile'}_${suffix}.png`;
-            
             const clone = targetElement.cloneNode(true);
             clone.classList.add('export-clone', 'force-light-theme');
             document.body.appendChild(clone);
             showToast('画像を生成中です...');
-            
-            try {
-                await nextFrame();
-                const canvas = await html2canvas(clone, { scale: 2 });
-                const a = document.createElement('a');
-                a.href = canvas.toDataURL('image/png');
-                a.download = fileName;
-                a.click();
-                showToast('画像の生成が完了しました。');
-            } catch (error) {
-                console.error('画像生成に失敗しました:', error);
-                showToast('エラー: 画像の生成に失敗しました。');
-            } finally {
-                document.body.removeChild(clone);
-            }
+            try { await nextFrame(); const canvas = await html2canvas(clone, { scale: 2 }); const a = document.createElement('a'); a.href = canvas.toDataURL('image/png'); a.download = fileName; a.click(); showToast('画像の生成が完了しました。'); } catch (error) { console.error('画像生成に失敗しました:', error); showToast('エラー: 画像の生成に失敗しました。'); } finally { document.body.removeChild(clone); }
         }
         
         function showToast(message) { const container = document.getElementById('toast-container'); const toast = document.createElement('div'); toast.className = 'toast-message'; toast.textContent = message; container.appendChild(toast); setTimeout(() => toast.classList.add('show'), 100); setTimeout(() => { toast.classList.remove('show'); toast.addEventListener('transitionend', () => toast.remove()); }, 3000); }
         function calculateTotals() {
-            let wins = [0, 0, 0, 0]; // 1着, 2着, 3着, 4着以下
-            let totalPrize = 0, totalFans = 0;
+            let wins = [0, 0, 0, 0]; let totalPrize = 0, totalFans = 0;
             appData.races.forEach(race => {
                 const rank = parseInt(race.rank, 10);
-                if (rank > 0) {
-                    if (rank === 1) wins[0]++;
-                    else if (rank === 2) wins[1]++;
-                    else if (rank === 3) wins[2]++;
-                    else wins[3]++;
-                }
-                totalPrize += parseInt(race.prize, 10) || 0;
-                totalFans += parseInt(race.fans, 10) || 0;
+                if (rank > 0) { if (rank === 1) wins[0]++; else if (rank === 2) wins[1]++; else if (rank === 3) wins[2]++; else wins[3]++; }
+                totalPrize += parseInt(race.prize, 10) || 0; totalFans += parseInt(race.fans, 10) || 0;
             });
-            const totalRaces = appData.races.length;
-            const resultsStr = `${totalRaces}戦${wins[0]}勝 [${wins[0]}-${wins[1]}-${wins[2]}-${wins[3]}]`;
-            document.getElementById('f-totalResults').value = resultsStr;
-            document.getElementById('o-totalResults').value = resultsStr;
-            document.getElementById('f-totalPrize').value = formatPrize(totalPrize);
-            document.getElementById('o-totalFans').value = formatFans(totalFans);
+            const totalRaces = appData.races.length; const resultsStr = `${totalRaces}戦${wins[0]}勝 [${wins[0]}-${wins[1]}-${wins[2]}-${wins[3]}]`;
+            document.getElementById('f-totalResults').value = resultsStr; document.getElementById('o-totalResults').value = resultsStr;
+            document.getElementById('f-totalPrize').value = formatPrize(totalPrize); document.getElementById('o-totalFans').value = formatFans(totalFans);
         }
         function formatPrize(amount) { if (amount === 0) return '0万円'; if (amount < 10000) return `${amount.toLocaleString()}万円`; const oku = Math.floor(amount / 10000); const man = amount % 10000; return man === 0 ? `${oku}億円` : `${oku}億${man.toLocaleString()}万円`; }
         function formatFans(amount) { return `${amount.toLocaleString()}人`; }
         function updateAllViews() { calculateTotals(); updateFormVisibility(); updateBasicInfoPreview(); updateResultsPreview(); }
         function updateFormVisibility() {
             const isFictional = appData.mode === 'fictional';
-            document.getElementById('form-fictional').style.display = isFictional ? 'block' : 'none';
-            document.getElementById('form-original').style.display = isFictional ? 'none' : 'block';
-            document.getElementById('race-prize-group').style.display = isFictional ? 'block' : 'none';
-            document.getElementById('race-fans-group').style.display = isFictional ? 'none' : 'block';
-            document.getElementById('race-jockey-group').style.display = isFictional ? 'block' : 'none';
-            document.getElementById('race-weight-odds-row').style.display = isFictional ? 'flex' : 'none';
+            document.getElementById('form-fictional').style.display = isFictional ? 'block' : 'none'; document.getElementById('form-original').style.display = isFictional ? 'none' : 'block';
+            document.getElementById('race-prize-group').style.display = isFictional ? 'block' : 'none'; document.getElementById('race-fans-group').style.display = isFictional ? 'none' : 'block';
+            document.getElementById('race-jockey-group').style.display = isFictional ? 'block' : 'none'; document.getElementById('race-weight-odds-row').style.display = isFictional ? 'flex' : 'none';
         }
         function updateBasicInfoPreview() { const container = document.getElementById('preview-basic-info'); const data = appData[appData.mode]; let html = ''; if (appData.mode === 'fictional') { const affiliation = [data.affiliationSelect, data.affiliationText].filter(Boolean).join(' '); html = `<tr><td colspan="2"><h2>${data.horseName || '馬名'} <small>${data.horseNameEn || ''}</small></h2></td></tr><tr><td colspan="2"><div class="pedigree-box"><span class="pedigree-label father-label">父</span><div><div class="pedigree-name">${data.father || '-'}</div></div></div></td></tr><tr><td colspan="2"><div class="pedigree-box"><span class="pedigree-label mother-label">母</span><div><div class="pedigree-name">${data.mother || '-'}</div><div class="pedigree-sire">母父: ${data.bms || '-'}</div></div></div></td></tr><tr><th>性齢</th><td>${data.sexAge || '-'}</td></tr><tr><th>所属</th><td>${affiliation || '-'}</td></tr><tr><th>馬主</th><td>${data.owner || '-'}</td></tr><tr><th>生産者</th><td>${data.breeder || '-'}</td></tr><tr><th>通算成績</th><td>${document.getElementById('f-totalResults').value || '-'}</td></tr><tr><th>総獲得賞金</th><td>${document.getElementById('f-totalPrize').value || '-'}</td></tr><tr><th>主な勝ち鞍</th><td>${data.mainWin || '-'}</td></tr><tr><th>生年月日</th><td>${data.birthday ? new Date(data.birthday + 'T00:00:00').toLocaleDateString('ja-JP') : '-'}</td></tr><tr><th>馬名の意味</th><td>${data.meaning || '-'}</td></tr><tr><th>次走予定</th><td>${data.nextRace || '-'}</td></tr>`; } else { const dorm = [data.dormSelect, data.dormText].filter(Boolean).join(' '); html = `<tr><td colspan="2"><h2>${data.name || '名前'} <small>${data.nameEn || ''}</small></h2></td></tr><tr><th>耳飾り</th><td>${data.ear || '-'}</td></tr><tr><th>学年</th><td>${data.grade || '-'}</td></tr><tr><th>所属寮</th><td>${dorm || '-'}</td></tr><tr><th>通算成績</th><td>${document.getElementById('o-totalResults').value || '-'}</td></tr><tr><th>累計ファン数</th><td>${document.getElementById('o-totalFans').value || '-'}</td></tr><tr><th>主な勝ち鞍</th><td>${data.mainWin || '-'}</td></tr><tr><th>生年月日</th><td>${data.birthday ? new Date(data.birthday + 'T00:00:00').toLocaleDateString('ja-JP') : '-'}</td></tr><tr><th>名前の意味</th><td>${data.meaning || '-'}</td></tr><tr><th>次走予定</th><td>${data.nextRace || '-'}</td></tr>`; } container.innerHTML = html; }
         function updateResultsPreview() {
-            const thead = document.getElementById('results-table-head');
-            const tbody = document.getElementById('preview-results-table');
-            const isFictional = appData.mode === 'fictional';
+            const thead = document.getElementById('results-table-head'); const tbody = document.getElementById('preview-results-table'); const isFictional = appData.mode === 'fictional';
             thead.innerHTML = isFictional ? `<tr><th>開催</th><th>レース名</th><th>距離</th><th>人気</th><th>着順</th><th>騎手</th><th>斤量</th><th>オッズ</th><th>操作</th></tr>` : `<tr><th>開催</th><th>レース名</th><th>距離</th><th>人気</th><th>着順</th><th>オッズ</th><th>操作</th></tr>`;
             tbody.innerHTML = '';
+            
+            const addPlaceholderIfNeeded = (index) => { if (index === insertionIndex) { const ph = document.createElement('tr'); ph.className = 'placeholder-row'; ph.innerHTML = `<td colspan="${isFictional ? 9 : 7}">▼ この位置に新しい成績が挿入されます ▼</td>`; tbody.appendChild(ph); } };
+            addPlaceholderIfNeeded(0);
+
             appData.races.forEach((race, index) => {
-                const gradeClass = getGradeClass(race.grade);
-                const popClass = getRankClass(race.pop);
-                const rankClass = getRankClass(race.rank);
-                const tr = document.createElement('tr');
-                if (isFictional) {
-                    tr.innerHTML = `<td>${race.date || '-'}<br>${race.course || '-'}</td><td class="race-name">${race.name || '-'} <span class="race-grade ${gradeClass}">${race.grade || ''}</span></td><td>${race.distance || '-'}</td><td class="${popClass}">${race.pop || '-'}</td><td class="${rankClass}">${race.rank || '-'}</td><td>${race.jockey || '-'}</td><td>${race.weight || '-'}</td><td>${race.odds || '-'}</td><td><div class="action-buttons"><button class="btn btn-edit" data-index="${index}">編集</button><button class="btn btn-delete" data-index="${index}">削除</button></div></td>`;
-                } else {
-                    tr.innerHTML = `<td>${race.date || '-'}<br>${race.course || '-'}</td><td class="race-name">${race.name || '-'} <span class="race-grade ${gradeClass}">${race.grade || ''}</span></td><td>${race.distance || '-'}</td><td class="${popClass}">${race.pop || '-'}</td><td class="${rankClass}">${race.rank || '-'}</td><td>${race.odds || '-'}</td><td><div class="action-buttons"><button class="btn btn-edit" data-index="${index}">編集</button><button class="btn btn-delete" data-index="${index}">削除</button></div></td>`;
-                }
+                const gradeClass = getGradeClass(race.grade); const popClass = getRankClass(race.pop); const rankClass = getRankClass(race.rank); const tr = document.createElement('tr');
+                const actionButtons = `<div class="action-buttons"><button class="btn btn-insert" data-index="${index}">挿入</button><button class="btn btn-edit" data-index="${index}">編集</button><button class="btn btn-delete" data-index="${index}">削除</button></div>`;
+                if (isFictional) { tr.innerHTML = `<td>${race.date || '-'}<br>${race.course || '-'}</td><td class="race-name">${race.name || '-'} <span class="race-grade ${gradeClass}">${race.grade || ''}</span></td><td>${race.distance || '-'}</td><td class="${popClass}">${race.pop || '-'}</td><td class="${rankClass}">${race.rank || '-'}</td><td>${race.jockey || '-'}</td><td>${race.weight || '-'}</td><td>${race.odds || '-'}</td><td>${actionButtons}</td>`; } 
+                else { tr.innerHTML = `<td>${race.date || '-'}<br>${race.course || '-'}</td><td class="race-name">${race.name || '-'} <span class="race-grade ${gradeClass}">${race.grade || ''}</span></td><td>${race.distance || '-'}</td><td class="${popClass}">${race.pop || '-'}</td><td class="${rankClass}">${race.rank || '-'}</td><td>${race.odds || '-'}</td><td>${actionButtons}</td>`; }
                 tbody.appendChild(tr);
+                addPlaceholderIfNeeded(index + 1);
             });
         }
         const raceFormIds = ['race-date', 'race-course', 'race-name', 'race-grade', 'race-distance', 'race-pop', 'race-rank', 'race-jockey', 'race-weight', 'race-odds', 'race-prize', 'race-fans'];
         function getRaceFormValues() { const v={}; raceFormIds.forEach(id=>v[id.replace('race-','')]=document.getElementById(id).value); return v; }
         function setRaceFormValues(data) { raceFormIds.forEach(id=>document.getElementById(id).value = data[id.replace('race-','')] || ''); }
-        function resetRaceForm() { editingIndex = null; addRaceBtn.textContent = '成績を追加'; addRaceBtn.classList.replace('btn-success', 'btn-primary'); raceFormIds.forEach(id => { document.getElementById(id).value = ''; }); }
+        function resetRaceForm(clearFields = true) {
+            editingIndex = null; insertionIndex = null;
+            addRaceBtn.textContent = '成績を追加'; addRaceBtn.classList.replace('btn-success', 'btn-primary');
+            document.getElementById('cancel-insert-btn').style.display = 'none';
+            if (clearFields) { raceFormIds.forEach(id => { document.getElementById(id).value = ''; }); }
+        }
         function loadDataIntoForms() { document.querySelector(`input[name="mode"][value="${appData.mode}"]`).checked = true; Object.keys(appData.fictional).forEach(k => { const e = document.getElementById(`f-${k}`); if(e && !e.readOnly) e.value = appData.fictional[k]; }); Object.keys(appData.original).forEach(k => { const e = document.getElementById(`o-${k}`); if(e && !e.readOnly) e.value = appData.original[k]; }); }
-        function getGradeClass(g) {
-            if (!g) return 'grade-other';
-            if (g.includes('Ⅰ')) return 'grade-g1';
-            if (g.includes('Ⅱ')) return 'grade-g2';
-            if (g.includes('Ⅲ')) return 'grade-g3';
-            if (g === 'L') return 'grade-l';
-            return 'grade-other';
-        }
-        function getRankClass(rank) {
-            const rankNum = parseInt(rank, 10);
-            if (rankNum === 1) return 'cell-rank-1';
-            if (rankNum === 2) return 'cell-rank-2';
-            if (rankNum === 3) return 'cell-rank-3';
-            return '';
-        }
+        function getGradeClass(g) { if (!g) return 'grade-other'; if (g.includes('Ⅰ')) return 'grade-g1'; if (g.includes('Ⅱ')) return 'grade-g2'; if (g.includes('Ⅲ')) return 'grade-g3'; if (g === 'L') return 'grade-l'; return 'grade-other'; }
+        function getRankClass(rank) { const rankNum = parseInt(rank, 10); if (rankNum === 1) return 'cell-rank-1'; if (rankNum === 2) return 'cell-rank-2'; if (rankNum === 3) return 'cell-rank-3'; return ''; }
         updateAllViews();
     });
     </script>
